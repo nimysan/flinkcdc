@@ -331,3 +331,6 @@ SELECT * FROM orders$snapshots;
 ## 遗留问题
 
 1. Vertex Timeline
+2. 如何直接在IDEA内跑Flink程序
+![run_insde_ide](./doc/run_inside_ide.png)
+
