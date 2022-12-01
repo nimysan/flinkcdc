@@ -275,11 +275,59 @@ CREATE TABLE enriched_orders (
  );
 
 ```
+
+最关键的一条， 这条语句会启动一个任务：
+
+```iso92-sql
+INSERT INTO enriched_orders
+ SELECT o.*, p.name, p.description, s.shipment_id, s.origin, s.destination, s.is_arrived
+ FROM orders AS o
+ LEFT JOIN products AS p ON o.product_id = p.id
+ LEFT JOIN shipments AS s ON o.order_id = s.order_id;
+
+```
+
+查看提交效果
+
+```bash
+Flink SQL> INSERT INTO enriched_orders
+>  SELECT o.*, p.name, p.description, s.shipment_id, s.origin, s.destination, s.is_arrived
+>  FROM orders AS o
+>  LEFT JOIN products AS p ON o.product_id = p.id
+>  LEFT JOIN shipments AS s ON o.order_id = s.order_id;
+[INFO] Submitting SQL update statement to the cluster...
+[INFO] SQL update statement has been successfully submitted to the cluster:
+Job ID: de7c334f7d072aa1dd558e66519f6845
+```
+jobname: insert-into_default_catalog.default_database.enriched_orders
+
+![sync_job](scripts/sync_job.png)
+
 可以通过
 http://localhost:56012/app/kibana#/discover?_g=(refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(columns:!(_source),index:'02b222e0-7129-11ed-999f-29886cf3f628',interval:auto,query:(language:kuery,query:''),sort:!(!(_score,desc)))
 查看 enriched_orders 是否有正常进入
+
+### 直接查询源表
+
+```iso92-sql
+select o.*, s.* from orders o, shipments s where o.order_id=s.order_id and o.order_id=10007;
+```
+
+![running_job](scripts/running_jobs.png)
+
+collect job 一直 restart;
+
+### 批量查询
+
+```iso92-sql
+SELECT * FROM orders$snapshots;
+```
 
 ## 总结
 
 1. Flink通过各种类型的Connector连接到各个源库；
 2. Flink可以"动态"，"持续"的从源库按照规则同步数据到新库；
+
+## 遗留问题
+
+1. Vertex Timeline
