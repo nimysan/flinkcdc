@@ -2,6 +2,8 @@
 
 [整体安装和体验教程](https://ververica.github.io/flink-cdc-connectors/release-2.1/content/quickstart/mysql-postgres-tutorial.html#enriching-orders-and-load-to-elasticsearch)
 
+[IDEA本地调试Flink Job](doc/IDEA本地调试FlinkJob.md)
+
 ## 环境说明
 1. 在AWS us-east-1上使用Linux 2
 2. 与教程不同， 实验使用Flink 1.16版本
