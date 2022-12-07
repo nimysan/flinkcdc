@@ -5,7 +5,7 @@
   <artifactId>flinkcdc</artifactId>
   <name>flinkcdc</name>
   <version>0.0.1-SNAPSHOT</version>
-  <description>Demo project for flink cdc</description>
+  <description>Learning project for flink cdc</description>
   <profiles>
     <profile>
       <id>spring</id>
@@ -57,7 +57,7 @@
                   </filters>
                   <transformers>
                     <transformer>
-                      <mainClass>top.cuteworld.sample.jobs.FraudDetectionJob</mainClass>
+                      <mainClass>top.cuteworld.sample.jobs.watermark.IotSensorDataIn5SecondJob</mainClass>
                     </transformer>
                     <transformer />
                   </transformers>
@@ -70,6 +70,30 @@
     </profile>
   </profiles>
   <dependencies>
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-runtime-web</artifactId>
+      <version>1.16.0</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>flink-runtime</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-netty</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-guava</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-jackson</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-streaming-java</artifactId>
@@ -85,20 +109,20 @@
           <groupId>org.apache.flink</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>flink-runtime</artifactId>
-          <groupId>org.apache.flink</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>flink-java</artifactId>
-          <groupId>org.apache.flink</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>flink-shaded-guava</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
         <exclusion>
           <artifactId>commons-math3</artifactId>
           <groupId>org.apache.commons</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-runtime</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-guava</artifactId>
+          <groupId>org.apache.flink</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -121,11 +145,11 @@
           <groupId>org.apache.flink</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>flink-runtime</artifactId>
+          <artifactId>flink-java</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>flink-java</artifactId>
+          <artifactId>flink-runtime</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
       </exclusions>
@@ -133,7 +157,7 @@
   </dependencies>
   <properties>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <start.class>top.cuteworld.sample.jobs.FraudDetectionJob</start.class>
+    <start.class>top.cuteworld.sample.jobs.watermark.IotSensorDataIn5SecondJob</start.class>
     <maven.compiler.source>1.8</maven.compiler.source>
     <flink.version>1.16.0</flink.version>
   </properties>

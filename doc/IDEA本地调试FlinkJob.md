@@ -1,3 +1,44 @@
+# IDEA本地调试FlinkJob.md
+
+## 修改Run Job Edit Configuration
+
+![idea_s1](images/idea_s1.png)
+
+![diea_s2](images/idea_s2.png)
+
+## 增加 flink-runtime-web， 支持web访问
+
+```bash
+org.apache.flink.util.FlinkException: The module flink-runtime-web could not be found in the class path. Please add this jar in order to enable web based job submission.
+	at org.apache.flink.runtime.webmonitor.WebMonitorUtils.loadWebSubmissionExtension(WebMonitorUtils.java:191)
+	at org.apache.flink.runtime.dispatcher.DispatcherRestEndpoint.initializeWebSubmissionHandlers(DispatcherRestEndpoint.java:110)
+	at org.apache.flink.runtime.webmonitor.WebMonitorEndpoint.initializeHandlers(WebMonitorEndpoint.java:275)
+	at org.apache.flink.runtime.dispatcher.DispatcherRestEndpoint.initializeHandlers(DispatcherRestEndpoint.java:87)
+	at org.apache.flink.runtime.rest.RestServerEndpoint.start(RestServerEndpoint.java:180)
+```
+
+增加以下pom依赖
+
+```xml
+
+<dependency>
+    <groupId>org.apache.flink</groupId>
+    <artifactId>flink-runtime-web</artifactId>
+    <version>${flink.version}</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+启动任何后在日志里面搜索, 点击打开
+
+```bash
+#关键字： Web frontend listening
+INFO org.apache.flink.runtime.dispatcher.DispatcherRestEndpoint - Web frontend listening at http://localhost:53970.
+```
+
+### 完整pom参考
+
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -14,14 +55,6 @@
         <start.class>top.cuteworld.sample.jobs.watermark.IotSensorDataIn5SecondJob</start.class>
     </properties>
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.projectlombok</groupId>-->
-        <!--            <artifactId>lombok</artifactId>-->
-        <!--            <version>0.10.1</version>-->
-        <!--            <scope>provided</scope>-->
-        <!--        </dependency>-->
-        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-runtime-web -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-runtime-web</artifactId>
@@ -128,3 +161,6 @@
 
 
 </project>
+
+```
+
