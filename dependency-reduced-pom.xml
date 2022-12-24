@@ -65,6 +65,19 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>3.0.1</version>
+            <configuration>
+              <excludes>
+                <exclude>
+                  <groupId>org.projectlombok</groupId>
+                  <artifactId>lombok</artifactId>
+                </exclude>
+              </excludes>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -76,10 +89,6 @@
       <version>1.16.0</version>
       <scope>provided</scope>
       <exclusions>
-        <exclusion>
-          <artifactId>flink-runtime</artifactId>
-          <groupId>org.apache.flink</groupId>
-        </exclusion>
         <exclusion>
           <artifactId>flink-shaded-netty</artifactId>
           <groupId>org.apache.flink</groupId>
@@ -117,10 +126,6 @@
           <groupId>org.apache.commons</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>flink-runtime</artifactId>
-          <groupId>org.apache.flink</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>flink-shaded-guava</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
@@ -148,11 +153,107 @@
           <artifactId>flink-java</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-connector-kafka</artifactId>
+      <version>1.16.0</version>
+      <scope>provided</scope>
+      <exclusions>
         <exclusion>
-          <artifactId>flink-runtime</artifactId>
+          <artifactId>flink-connector-base</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>kafka-clients</artifactId>
+          <groupId>org.apache.kafka</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-connector-jdbc</artifactId>
+      <version>1.16.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-runtime</artifactId>
+      <version>1.16.0</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>flink-rpc-core</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-rpc-akka-loader</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-queryable-state-client-java</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-hadoop-fs</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-io</artifactId>
+          <groupId>commons-io</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-zookeeper-3</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-lang3</artifactId>
+          <groupId>org.apache.commons</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>javassist</artifactId>
+          <groupId>org.javassist</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>snappy-java</artifactId>
+          <groupId>org.xerial.snappy</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>lz4-java</artifactId>
+          <groupId>org.lz4</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-netty</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-jackson</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-cli</artifactId>
+          <groupId>commons-cli</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-core</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-java</artifactId>
+          <groupId>org.apache.flink</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>flink-shaded-guava</artifactId>
           <groupId>org.apache.flink</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.31</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <properties>

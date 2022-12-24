@@ -40,7 +40,7 @@ public class StreamJob {
                         }
                     }
                 })
-                .keyBy("word")//key为word字段
+                .keyBy(WordWithCount::getWord)//key为word字段
                 .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(5)))    //五秒一次的翻滚时间窗口
 
                 .reduce(new ReduceFunction<WordWithCount>() { //reduce策略

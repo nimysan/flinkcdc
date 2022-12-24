@@ -21,6 +21,22 @@ public class WordWithCount {
         this.count = count;
     }
 
+    public String getWord() {
+        return word;
+    }
+
+    public void setWord(String word) {
+        this.word = word;
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
+    }
+
     /**
      * 将单词内容和频率展示出来
      *
