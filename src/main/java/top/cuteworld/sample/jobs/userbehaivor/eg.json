@@ -1,0 +1,39 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "Source: Kafka Source",
+      "pact": "Data Source",
+      "contents": "Source: Kafka Source",
+      "parallelism": 1
+    },
+    {
+      "id": 3,
+      "type": "TumblingEventTimeWindows",
+      "pact": "Operator",
+      "contents": "Window(TumblingEventTimeWindows(60000), ContinuousProcessingTimeTrigger, CountAggregate, ProductViewCountWindowResult)",
+      "parallelism": 1,
+      "predecessors": [
+        {
+          "id": 1,
+          "ship_strategy": "HASH",
+          "side": "second"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "Sink: Unnamed",
+      "pact": "Data Sink",
+      "contents": "Sink: Unnamed",
+      "parallelism": 1,
+      "predecessors": [
+        {
+          "id": 3,
+          "ship_strategy": "HASH",
+          "side": "second"
+        }
+      ]
+    }
+  ]
+}

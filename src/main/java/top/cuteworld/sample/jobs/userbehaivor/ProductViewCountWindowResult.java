@@ -9,11 +9,11 @@ import org.apache.flink.util.Collector;
 /**
  * 计数
  */
-public class ProductViewCountWindowResult<IN, OUT, KEY, W extends Window> implements WindowFunction<Long, ProductViewAccount, Tuple, TimeWindow> {
+public class ProductViewCountWindowResult<IN, OUT, KEY, W extends Window> implements WindowFunction<Long, ProductViewAccount, String, TimeWindow> {
 
     @Override
-    public void apply(Tuple key, TimeWindow window, Iterable<Long> input, Collector<ProductViewAccount> out) throws Exception {
-        String productId = key.getField(0);
+    public void apply(String key, TimeWindow window, Iterable<Long> input, Collector<ProductViewAccount> out) throws Exception {
+        String productId = key;
         Long end = window.getEnd();
         Long count = input.iterator().next();
         out.collect(new ProductViewAccount(productId, end, count));
