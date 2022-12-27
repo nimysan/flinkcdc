@@ -35,4 +35,13 @@ public class ProductViewAccount {
     public void setCount(Long count) {
         this.count = count;
     }
+
+    @Override
+    public String toString() {
+        return "ProductViewAccount{" +
+                "productId='" + productId + '\'' +
+                ", windowEnd=" + windowEnd +
+                ", count=" + count +
+                '}';
+    }
 }

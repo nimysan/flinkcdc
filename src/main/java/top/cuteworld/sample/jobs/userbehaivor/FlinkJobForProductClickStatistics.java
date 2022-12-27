@@ -44,7 +44,7 @@ import java.time.Duration;
  *
  * <strong>Note that using ProcessWindowFunction for simple aggregates such as count is quite inefficient. The next section shows how a ReduceFunction or AggregateFunction can be combined with a ProcessWindowFunction to get both incremental aggregation and the added information of a ProcessWindowFunction. </strong>
  */
-public class FlinkJobForUA {
+public class FlinkJobForProductClickStatistics {
 
 //    public final static String BROKERS = "b-3.rdskafkareplication.qh77pm.c1.kafka.us-east-1.amazonaws.com:9092,b-1.rdskafkareplication.qh77pm.c1.kafka.us-east-1.amazonaws.com:9092,b-2.rdskafkareplication.qh77pm.c1.kafka.us-east-1.amazonaws.com:9092";
 

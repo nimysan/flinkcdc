@@ -39,6 +39,16 @@ public class UserBehaviorItem {
     public void setAction(String action) {
         this.action = action;
     }
+
+    @Override
+    public String toString() {
+        return "UserBehaviorItem{" +
+                "eventTime=" + eventTime +
+                ", productId='" + productId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", action='" + action + '\'' +
+                '}';
+    }
 }
 
 

@@ -8,6 +8,11 @@
 1. 在AWS us-east-1上使用Linux 2
 2. 与教程不同， 实验使用Flink 1.16版本
 
+
+## 其他例子
+
+1. [用户点击行为统计](doc/behaivor.md)
+
 > account id: 390468416359  AMI(ami-0f4b62812662f73d1): FlinkCDC-Mysql-ES-AMI
 ## 安装docker
 

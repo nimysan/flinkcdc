@@ -4,20 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
-import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
-import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
-import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.util.Collector;
 
-import java.sql.Timestamp;
 import java.time.Duration;
+import java.util.Iterator;
 
 /**
  * 从kafka分析数据
@@ -44,7 +43,7 @@ import java.time.Duration;
  *
  * <strong>Note that using ProcessWindowFunction for simple aggregates such as count is quite inefficient. The next section shows how a ReduceFunction or AggregateFunction can be combined with a ProcessWindowFunction to get both incremental aggregation and the added information of a ProcessWindowFunction. </strong>
  */
-public class FlinkJobForUA {
+public class FlinkJobForClickStatistics {
 
 //    public final static String BROKERS = "b-3.rdskafkareplication.qh77pm.c1.kafka.us-east-1.amazonaws.com:9092,b-1.rdskafkareplication.qh77pm.c1.kafka.us-east-1.amazonaws.com:9092,b-2.rdskafkareplication.qh77pm.c1.kafka.us-east-1.amazonaws.com:9092";
 
@@ -77,30 +76,54 @@ public class FlinkJobForUA {
 
         kafka_source.setParallelism(1); //设置为1， 方便观察
 
-        SingleOutputStreamOperator<ProductViewAccount> singleOutputStreamOperator = kafka_source
+        kafka_source
                 .keyBy(UserBehaviorItem::getProductId)
+//                .assignTimestampsAndWatermarks()ss
+                //时间翻转为1分钟， 允许5s延迟
+//                .timeWindow()
+//                .window(TumblingEventTimeWindows.of(Time.days(1), Time.hours(-8))) //epoch延迟8个小时, 中国区的时间
                 .window(TumblingEventTimeWindows.of(Time.minutes(1)))
-                .aggregate(new CountAggregate(), new ProductViewCountWindowResult());
-        singleOutputStreamOperator.addSink(JdbcSink.sink(
-                "insert into uv_results (pid, count, last_modified_at, window_end) values (?, ?, ?, ?)",
-                (statement, pvc) -> {
-                    statement.setString(1, pvc.getProductId());
-                    statement.setLong(2, pvc.getCount());
-                    statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                    statement.setTimestamp(4, new Timestamp(pvc.getWindowEnd()));
-                },
-                JdbcExecutionOptions.builder()
-                        .withBatchSize(1)
-                        .withBatchIntervalMs(200)
-                        .withMaxRetries(2)
-                        .build(),
-                new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
-                        .withUrl("jdbc:mysql://localhost:3306/uv")
-                        .withDriverName("com.mysql.cj.jdbc.Driver")
-                        .withUsername("test")
-                        .withPassword("newpass")
-                        .build()
-        )).name("sinkuvjdbc").setParallelism(1);
+                .process(new ProcessWindowFunction<UserBehaviorItem, Object, String, TimeWindow>() {
+                    @Override
+                    public void process(String s, ProcessWindowFunction<UserBehaviorItem, Object, String, TimeWindow>.Context context, Iterable<UserBehaviorItem> elements, Collector<Object> out) throws Exception {
+                        int count = 0;
+                        synchronized (FlinkJobForClickStatistics.class) {
+                            System.out.println(Thread.currentThread().getId() + " ---------------");
+                            Iterator<UserBehaviorItem> iterator = elements.iterator();
+                            while (iterator.hasNext()) {
+                                UserBehaviorItem next = iterator.next();
+                                System.out.println(next);
+                                count++;
+                            }
+                            out.collect("Window: " + context.window() + "count: " + count);
+                        }
+
+                    }
+                }).print("hellohello sink->");
+//                .trigger(ContinuousEventTimeTrigger.of(Time.seconds(5)))
+//                .aggregate(new CountAggregate(), new ProductViewCountWindowResult()).setParallelism(1).print("hello");
+
+
+//        aggregate.keyBy(ProductViewAccount::getWindowEnd).addSink(JdbcSink.sink(
+//                "insert into uv_results (pid, count, last_modified_at, window_end) values (?, ?, ?, ?)",
+//                (statement, pvc) -> {
+//                    statement.setString(1, pvc.getProductId());
+//                    statement.setLong(2, pvc.getCount());
+//                    statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+//                    statement.setTimestamp(4, new Timestamp(pvc.getWindowEnd()));
+//                },
+//                JdbcExecutionOptions.builder()
+//                        .withBatchSize(1000)
+//                        .withBatchIntervalMs(2000)
+//                        .withMaxRetries(2)
+//                        .build(),
+//                new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
+//                        .withUrl("jdbc:mysql://localhost:3306/uv")
+//                        .withDriverName("com.mysql.cj.jdbc.Driver")
+//                        .withUsername("test")
+//                        .withPassword("newpass")
+//                        .build()
+//        )).setParallelism(1);
 
 
         //执行

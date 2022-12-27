@@ -11,6 +11,7 @@ public class CountAggregate<IN, ACC, OUT> implements AggregateFunction<UserBehav
 
     @Override
     public Long add(UserBehaviorItem value, Long accumulator) {
+        System.out.println("The acc is " + accumulator + " with element " + value);
         return accumulator + 1;
     }
 
