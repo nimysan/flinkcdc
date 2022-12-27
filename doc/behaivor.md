@@ -38,7 +38,7 @@ ssh -L 9000:54.152.225.130:9000 ec2-user@54.152.225.130
 
 ```
 
-### 每一分钟为一个Thumbling window, 统计Product被点击的次数
+### 每一分钟为一个tumbling window, 统计Product被点击的次数
 
 代码参见： FlinkJobForProductClickStatistics
 
