@@ -5,15 +5,19 @@
 [IDEA本地调试Flink Job](doc/IDEA本地调试FlinkJob.md)
 
 ## 环境说明
+
 1. 在AWS us-east-1上使用Linux 2
 2. 与教程不同， 实验使用Flink 1.16版本
-
 
 ## 其他例子
 
 1. [用户点击行为统计](doc/behaivor.md)
+2. Lateness的体验参考FlinkJobLatenessJob.java的实现， 该实现内部启动socket server并发送谁模拟延迟
+3. 部署选型 - https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/overview/
+4. 所有很多Window的操作代码都在这个里面 WindowOperator 可以参考这个代码的实现去理解很多window的逻辑
 
 > account id: 390468416359  AMI(ami-0f4b62812662f73d1): FlinkCDC-Mysql-ES-AMI
+
 ## 安装docker
 
 [install docker on AWS Linux 2](https://www.cyberciti.biz/faq/how-to-install-docker-on-amazon-linux-2/)
@@ -74,7 +78,7 @@ ssh -L 56012:34.207.59.225:5601 ec2-user@34.207.59.225
 
 > 本地访问kibana地址: http://localhost:56012 (访问正常设置成功)
 
-### 在原始库中插入数据  数据准备
+### 在原始库中插入数据 数据准备
 
 MySQL源库数据准备
 
@@ -144,8 +148,8 @@ VALUES (default,10001,'Beijing','Shanghai',false),
        (default,10003,'Shanghai','Hangzhou',false);
 ```
 
-
 ### 下载启动Flink服务
+
 > 清注意版本
 [CDC connector下载地址](https://github.com/ververica/flink-cdc-connectors/releases)
 
@@ -208,6 +212,7 @@ default_database
 ```
 
 以下是几个建表语句：
+
 ```iso92-sql
 CREATE TABLE products (
     id INT,
@@ -306,6 +311,7 @@ Flink SQL> INSERT INTO enriched_orders
 [INFO] SQL update statement has been successfully submitted to the cluster:
 Job ID: de7c334f7d072aa1dd558e66519f6845
 ```
+
 jobname: insert-into_default_catalog.default_database.enriched_orders
 
 ![sync_job](scripts/sync_job.png)
@@ -339,5 +345,5 @@ SELECT * FROM orders$snapshots;
 
 1. Vertex Timeline
 2. 如何直接在IDEA内跑Flink程序
-![run_insde_ide](./doc/run_inside_ide.png)
+   ![run_insde_ide](./doc/run_inside_ide.png)
 

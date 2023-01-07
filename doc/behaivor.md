@@ -120,3 +120,13 @@ MariaDB [uv]> select pid,sum(count) from uv_results group by pid order by sum(co
 #### 解决方案（2）：
 
 > 万能的Flink
+> 
+
+
+### 错误解决
+
+#### 问题： Kryo serializer scala extensions are not available.
+
+```bash
+22:40:59.516 [TumblingEventTimeWindows -> Sink: Print to Std. Out (1/1)#0] INFO org.apache.flink.api.java.typeutils.runtime.kryo.KryoSerializer - Kryo serializer scala extensions are not available.
+```

@@ -3,6 +3,7 @@ package top.cuteworld.sample.jobs.userbehaivor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.MetricOptions;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
@@ -54,8 +55,9 @@ public class FlinkJobForClickStatistics {
         // 定义一个配置 import org.apache.flink.configuration.Configuration;包下
         Configuration configuration = new Configuration();
 
-// 指定本地WEB-UI端口号
+        // 指定本地WEB-UI端口号
         configuration.setInteger(RestOptions.PORT, 8082);
+
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(configuration);
 
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
