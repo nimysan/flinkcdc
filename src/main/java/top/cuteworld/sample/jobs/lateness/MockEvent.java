@@ -10,6 +10,8 @@ public class MockEvent implements java.io.Serializable {
     private Long eventTime;
     private Long emitTime;
 
+    private final String eventType = "simple";
+
     private Long id;
 
     public MockEvent(String eventId, Long eventTime) {
@@ -38,6 +40,10 @@ public class MockEvent implements java.io.Serializable {
         String late = Math.round((emitTime - eventTime) / 1000) + "s";
         return "MockEvent (lateness-" + late + ") - {" + "eventId='" + eventId + '\'' + ", eventTime=" + sdf.format(new Date(eventTime)) + ", emitTime=" + sdf.format(new Date(emitTime)) + '}';
 
+    }
+
+    public String getEventType() {
+        return eventType;
     }
 
     public String getEventId() {

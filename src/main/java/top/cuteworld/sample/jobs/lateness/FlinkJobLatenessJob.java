@@ -41,6 +41,8 @@ public class FlinkJobLatenessJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlinkJobLatenessJob.class);
 
+    private static final int SAMPLE_LATENESS = 0;
+
     public static void main(String[] args) throws Exception {
 
         LOG.info("hello flink is running...");
@@ -56,26 +58,33 @@ public class FlinkJobLatenessJob {
         StreamExecutionEnvironment env =
                 StreamExecutionEnvironment.getExecutionEnvironment(configuration);
         env.setParallelism(1);
+        env.getConfig().setAutoWatermarkInterval(9000);
         Thread emitData = new Thread(new SocketMockEventGenerator(1000, 10 * 1000, 100));
         emitData.start();
 
         Long current = System.currentTimeMillis();
-//        OutputTag<MockEvent> test = new OutputTag<>("test");
+
 
         //从socket获得数据
         DataStreamSource<String> source = env.socketTextStream("localhost", 9093, "\r\n", -1).setParallelism(1);
-        SingleOutputStreamOperator<String> stream = source.map((MapFunction<String, MockEvent>) MockEvent::new)
+
+        //延迟数据
+        final OutputTag<MockEvent> lateOutputTag = new OutputTag<MockEvent>("late-data") {
+        };
+
+        SingleOutputStreamOperator<String> dataStream = source.map((MapFunction<String, MockEvent>) MockEvent::new)
                 .assignTimestampsAndWatermarks(
                         //无延迟的Watermark, 使用event.getEventTime()作为Flink EventTime
                         WatermarkStrategy.<MockEvent>forBoundedOutOfOrderness(Duration.ZERO).withTimestampAssigner((event, timestamp) -> event.getEventTime())
                 )
                 //根据eventId分区
-                .keyBy(MockEvent::getEventId)
+                .keyBy(MockEvent::getEventType)
                 //每10s翻转一个时间窗口
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
 //                .sideOutputLateData(test)
                 //允许三秒延迟
-                .allowedLateness(Time.seconds(3))
+                .allowedLateness(Time.seconds(SAMPLE_LATENESS))
+                .sideOutputLateData(lateOutputTag)
                 .process(new ProcessWindowFunction<MockEvent, String, String, TimeWindow>() {
                     @Override
                     public void process(String s, ProcessWindowFunction<MockEvent, String, String, TimeWindow>.Context context, Iterable<MockEvent> elements, Collector<String> out) throws Exception {
@@ -83,25 +92,42 @@ public class FlinkJobLatenessJob {
 
                         String currentTime = sdf.format(new Date());
                         StringBuffer buffer = new StringBuffer("\r\n");
+
+                        Long currentWatermark = context.currentWatermark();
+                        String currentWatermarkString = "当前Watermark:" + sdf.format(new Date(currentWatermark));
+
+
+                        buffer.append("Processed at --->" + currentTime + " Window (" + sdf.format(new Date(context.window().getStart())) + "---" + sdf.format(new Date(context.window().getEnd())) + "] " + currentWatermarkString + "---\r\n");
                         int count = 0;
 
                         long windowEnd = context.window().getEnd();
                         Iterator<MockEvent> iterator = elements.iterator();
                         while (iterator.hasNext()) {
                             MockEvent next = iterator.next();
-                            Long eventTimeOfEndtime = (windowEnd - next.getEventTime()) / 1000;
-                            Long emitTimeOfEndtime = (windowEnd - next.getEmitTime()) / 1000;
-                            buffer.append("count " + (count + 1) + " " + next + " event-e:" + eventTimeOfEndtime.intValue() + "(s) - emit-e:" + emitTimeOfEndtime.intValue() + "s\r\n");
+                            buffer.append(next.toString() + " -> ");
+                            Long eventComeToFlink = (windowEnd - next.getEmitTime());
+                            if (eventComeToFlink >= 0) {
+                                //在时间窗口内就到达了
+                            } else {
+                                //这是延迟到达的数据
+                                String eventLateness = "比窗口关闭时间延迟:" + Math.abs(eventComeToFlink);
+                                if (Math.abs(eventComeToFlink) > SAMPLE_LATENESS * 1000) {
+//                                    buffer.append(eventLateness);
+                                }
+                                buffer.append(eventLateness);
+                            }
+                            buffer.append("\r\n");
                             count++;
                         }
 
-                        out.collect("Processed at --->" + currentTime + " window (" + sdf.format(new Date(context.window().getStart())) + ":" + sdf.format(new Date(context.window().getEnd())) + "]\r\n" + buffer.toString());
+                        out.collect(buffer.toString());
                     }
                 }).returns(TypeInformation.of(String.class));
 
 
-        stream.print("cuteworldsink").setParallelism(1);
-//        stream.getSideOutput(test).print("cuteworldsink-side");
+        dataStream.print("cuteworldsink").setParallelism(1);
+        dataStream.getSideOutput(lateOutputTag).print("cuteworldsink-sidelate");
+
         env.execute("测试Flink lateness 应用");
 
         /**

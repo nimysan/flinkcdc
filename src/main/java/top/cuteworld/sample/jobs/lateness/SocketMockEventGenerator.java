@@ -1,5 +1,6 @@
 package top.cuteworld.sample.jobs.lateness;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,8 @@ public class SocketMockEventGenerator implements Runnable {
      */
     private long count = 10l;
 
+    public static int startid = 1;
+
     /**
      * 初始化的时候创建一个Socket服务
      */
@@ -60,7 +63,7 @@ public class SocketMockEventGenerator implements Runnable {
             long generatedCount = 0;
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
             while (generatedCount <= count) {
-                writeData(dOut, new MockEvent("t1", System.currentTimeMillis()));
+                writeData(dOut, new MockEvent(StringUtils.rightPad("e" + generatedCount + 1, 5), System.currentTimeMillis()));
                 generatedCount++;
                 pause(internal);
             }
