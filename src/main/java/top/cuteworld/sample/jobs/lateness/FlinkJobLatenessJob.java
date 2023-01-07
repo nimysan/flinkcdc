@@ -4,7 +4,6 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.JobManagerOptions;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.configuration.TaskManagerOptions;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -41,7 +40,7 @@ public class FlinkJobLatenessJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlinkJobLatenessJob.class);
 
-    private static final int SAMPLE_LATENESS = 0;
+    private static final int SAMPLE_LATENESS = 5;
 
     public static void main(String[] args) throws Exception {
 
@@ -53,13 +52,13 @@ public class FlinkJobLatenessJob {
         //启用flamegraph
         configuration.setBoolean(RestOptions.ENABLE_FLAMEGRAPH, true);
 
-        configuration.setInteger(TaskManagerOptions.NUM_TASK_SLOTS, 8);
+        configuration.setInteger(TaskManagerOptions.NUM_TASK_SLOTS, 1);
 
         StreamExecutionEnvironment env =
                 StreamExecutionEnvironment.getExecutionEnvironment(configuration);
         env.setParallelism(1);
-        env.getConfig().setAutoWatermarkInterval(9000);
-        Thread emitData = new Thread(new SocketMockEventGenerator(1000, 10 * 1000, 100));
+//        env.getConfig().setAutoWatermarkInterval(9000);
+        Thread emitData = new Thread(new SocketMockEventGenerator(1000, 30 * 1000, Long.MAX_VALUE));
         emitData.start();
 
         Long current = System.currentTimeMillis();
@@ -80,7 +79,7 @@ public class FlinkJobLatenessJob {
                 //根据eventId分区
                 .keyBy(MockEvent::getEventType)
                 //每10s翻转一个时间窗口
-                .window(TumblingEventTimeWindows.of(Time.seconds(10)))
+                .window(TumblingEventTimeWindows.of(Time.seconds(30)))
 //                .sideOutputLateData(test)
                 //允许三秒延迟
                 .allowedLateness(Time.seconds(SAMPLE_LATENESS))
@@ -126,7 +125,7 @@ public class FlinkJobLatenessJob {
 
 
         dataStream.print("cuteworldsink").setParallelism(1);
-        dataStream.getSideOutput(lateOutputTag).print("cuteworldsink-sidelate");
+        dataStream.getSideOutput(lateOutputTag).print("latedata");
 
         env.execute("测试Flink lateness 应用");
 
