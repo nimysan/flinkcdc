@@ -58,30 +58,31 @@ public class FlinkJobLatenessJob {
                 StreamExecutionEnvironment.getExecutionEnvironment(configuration);
         env.setParallelism(1);
 //        env.getConfig().setAutoWatermarkInterval(9000);
-        Thread emitData = new Thread(new SocketMockEventGenerator(1000, 30 * 1000, Long.MAX_VALUE));
+        Thread emitData = new Thread(new SocketMockEventGenerator(1000, 10 * 1000, Long.MAX_VALUE));
         emitData.start();
 
         Long current = System.currentTimeMillis();
 
 
         //从socket获得数据
-        DataStreamSource<String> source = env.socketTextStream("localhost", 9093, "\r\n", -1).setParallelism(1);
+        DataStreamSource<String> randomPauseSource = env.socketTextStream("localhost", 9093, "\r\n", -1).setParallelism(1);
 
         //延迟数据
         final OutputTag<MockEvent> lateOutputTag = new OutputTag<MockEvent>("late-data") {
         };
 
-        SingleOutputStreamOperator<String> dataStream = source.map((MapFunction<String, MockEvent>) MockEvent::new)
+
+        SingleOutputStreamOperator<String> dataStream = randomPauseSource.map((MapFunction<String, MockEvent>) MockEvent::new)
                 .assignTimestampsAndWatermarks(
                         //无延迟的Watermark, 使用event.getEventTime()作为Flink EventTime
                         WatermarkStrategy.<MockEvent>forBoundedOutOfOrderness(Duration.ZERO).withTimestampAssigner((event, timestamp) -> event.getEventTime())
                 )
+
                 //根据eventId分区
                 .keyBy(MockEvent::getEventType)
                 //每10s翻转一个时间窗口
-                .window(TumblingEventTimeWindows.of(Time.seconds(30)))
-//                .sideOutputLateData(test)
-                //允许三秒延迟
+                .window(TumblingEventTimeWindows.of(Time.seconds(10)))
+                //允许指定秒延迟
                 .allowedLateness(Time.seconds(SAMPLE_LATENESS))
                 .sideOutputLateData(lateOutputTag)
                 .process(new ProcessWindowFunction<MockEvent, String, String, TimeWindow>() {

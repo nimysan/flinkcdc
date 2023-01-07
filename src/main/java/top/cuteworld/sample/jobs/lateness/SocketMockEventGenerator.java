@@ -38,6 +38,8 @@ public class SocketMockEventGenerator implements Runnable {
 
     public static int startid = 1;
 
+    private Timer timer = new Timer();
+
     /**
      * 初始化的时候创建一个Socket服务
      */
@@ -60,8 +62,20 @@ public class SocketMockEventGenerator implements Runnable {
         Socket socket = null;
         try {
             socket = serverSocket.accept();
-            long generatedCount = 0;
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        SocketMockEventGenerator.this.writeData(dOut, new MockEvent(StringUtils.rightPad("s3", 5), System.currentTimeMillis()), true);
+                        LOG.info("------###### Internal generate event");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, 0, 500);//每500ms触发一个
+
+            long generatedCount = 0;
             while (generatedCount <= count) {
                 writeData(dOut, new MockEvent(StringUtils.rightPad("e" + generatedCount + 1, 5), System.currentTimeMillis()));
                 generatedCount++;
@@ -83,7 +97,17 @@ public class SocketMockEventGenerator implements Runnable {
         }
     }
 
-    private void writeData(DataOutputStream dOut, MockEvent data) throws IOException {
+
+    public void writeData(DataOutputStream dOut, MockEvent data) throws IOException {
+        writeData(dOut, data, false);
+    }
+
+    public void writeData(DataOutputStream dOut, MockEvent data, boolean emitAtOnce) throws IOException {
+        if (emitAtOnce) {
+            emit(dOut, data);
+            return;
+        }
+        //进入延迟发射阶段
         if (randomPause >= 0) {
             long emitDelay = Math.round(Math.random() * randomPause);
             if (randomPause < randomPause / 2) {
