@@ -40,7 +40,7 @@ public class FlinkJobLatenessJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlinkJobLatenessJob.class);
 
-    private static final int SAMPLE_LATENESS = 5;
+    private static final int SAMPLE_LATENESS = 3;
 
     public static void main(String[] args) throws Exception {
 
@@ -58,7 +58,7 @@ public class FlinkJobLatenessJob {
                 StreamExecutionEnvironment.getExecutionEnvironment(configuration);
         env.setParallelism(1);
 //        env.getConfig().setAutoWatermarkInterval(9000);
-        Thread emitData = new Thread(new SocketMockEventGenerator(1000, 10 * 1000, Long.MAX_VALUE));
+        Thread emitData = new Thread(new SocketMockEventGenerator(1000, 10 * 1000, Long.MAX_VALUE, false));
         emitData.start();
 
         Long current = System.currentTimeMillis();

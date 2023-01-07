@@ -38,6 +38,8 @@ public class SocketMockEventGenerator implements Runnable {
 
     public static int startid = 1;
 
+    private boolean withIntervalEmit = false;
+
     private Timer timer = new Timer();
 
     /**
@@ -51,11 +53,12 @@ public class SocketMockEventGenerator implements Runnable {
         }
     }
 
-    public SocketMockEventGenerator(long internal, long randomPause, long count) {
+    public SocketMockEventGenerator(long internal, long randomPause, long count, boolean withIntervalEmit) {
         this();
         this.internal = internal;
         this.randomPause = randomPause;
         this.count = count;
+        this.withIntervalEmit = withIntervalEmit;
     }
 
     public void run() {
@@ -63,17 +66,20 @@ public class SocketMockEventGenerator implements Runnable {
         try {
             socket = serverSocket.accept();
             DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        SocketMockEventGenerator.this.writeData(dOut, new MockEvent(StringUtils.rightPad("s3", 5), System.currentTimeMillis()), true);
-                        LOG.info("------###### Internal generate event");
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            if (withIntervalEmit) {
+                timer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            SocketMockEventGenerator.this.writeData(dOut, new MockEvent(StringUtils.rightPad("s3", 5), System.currentTimeMillis()), true);
+                            LOG.info("------###### Internal generate event");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }, 0, 500);//每500ms触发一个
+                }, 0, 500);//每500ms触发一个
+            }
+
 
             long generatedCount = 0;
             while (generatedCount <= count) {

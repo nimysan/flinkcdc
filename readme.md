@@ -12,7 +12,7 @@
 ## 其他例子
 
 1. [用户点击行为统计](doc/behaivor.md)
-2. Lateness的体验参考FlinkJobLatenessJob.java的实现， 该实现内部启动socket server并发送谁模拟延迟
+2. [Lateness的体验参考FlinkJobLatenessJob.java的实现， 该实现内部启动socket server发送数据模拟延迟](doc/latenss.md)
 3. 部署选型 - https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/overview/
 4. 所有很多Window的操作代码都在这个里面 WindowOperator 可以参考这个代码的实现去理解很多window的逻辑
 
