@@ -1,0 +1,39 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "Source: Collection Source",
+      "pact": "Data Source",
+      "contents": "Source: Collection Source",
+      "parallelism": 1
+    },
+    {
+      "id": 2,
+      "type": "Filter",
+      "pact": "Operator",
+      "contents": "Filter",
+      "parallelism": 8,
+      "predecessors": [
+        {
+          "id": 1,
+          "ship_strategy": "REBALANCE",
+          "side": "second"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "Sink: Print to Std. Out",
+      "pact": "Data Sink",
+      "contents": "Sink: Print to Std. Out",
+      "parallelism": 8,
+      "predecessors": [
+        {
+          "id": 2,
+          "ship_strategy": "FORWARD",
+          "side": "second"
+        }
+      ]
+    }
+  ]
+}
