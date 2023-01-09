@@ -1,6 +1,8 @@
 package top.cuteworld.flink.sample.table;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableEnvironment;
@@ -21,7 +23,9 @@ public class RealtimeTableReportJob {
 
     public static void main(String[] args) {
 
-        EnvironmentSettings settings = EnvironmentSettings.newInstance().build();
+        Configuration configuration = new Configuration();
+        configuration.setInteger(RestOptions.PORT, 8082);
+        EnvironmentSettings settings = EnvironmentSettings.newInstance().withConfiguration(configuration).build();
         TableEnvironment tEnv = TableEnvironment.create(settings);
 //        readSQL();
 

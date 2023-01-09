@@ -6,7 +6,8 @@ CREATE TABLE transactions (
 ) WITH (
     'connector' = 'kafka',
     'topic'     = 'transactions',
-    'properties.bootstrap.servers' = 'localhost:9092',
+    'scan.startup.mode' = 'earliest-offset',
+    'properties.bootstrap.servers' = 'kafka:9092',
     'properties.group.id' = 'k123',
     'format'    = 'csv'
 )

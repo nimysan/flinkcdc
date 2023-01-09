@@ -4,7 +4,7 @@ create TABLE spend_report (
     amount     BIGINT
 ,    PRIMARY KEY (account_id, log_ts) NOT ENFORCED) with (
    'connector'  = 'jdbc',
-   'url'        = 'jdbc:mysql://mysql:3306/sql-demo',
+   'url'        = 'jdbc:mysql://localhost:3307/sql-demo',
    'table-name' = 'spend_report',
    'driver'     = 'com.mysql.jdbc.Driver',
    'username'   = 'sql-demo',
