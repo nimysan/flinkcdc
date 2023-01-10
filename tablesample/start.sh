@@ -1,1 +1,1 @@
-docker-compose -f docker-compose.yml up -d
+docker-compose -n tablesample -f docker-compose.yml up -d
