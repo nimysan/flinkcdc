@@ -1,3 +1,6 @@
+[submodule "cutedatagen"]
+	path = tablesample/cutedatagen
+	url = https://github.com/nimysan/cutedatagen.git
 [submodule "tablesample/cutedatagen"]
 	path = tablesample/cutedatagen
 	url = https://github.com/nimysan/cutedatagen.git
