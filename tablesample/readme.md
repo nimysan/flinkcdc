@@ -4,6 +4,14 @@
 
 ## Cloud9 
 
+```bash
+git clone https://github.com/nimysan/flinkcdc.git
+cd flinkcdc
+git submodule init
+git submodule update --remote --merge
+cd tablesample/
+```
+
 ## kafka table支持属性
 
 ![kafdrop](./images/img.png)
