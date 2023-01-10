@@ -1,5 +1,7 @@
 # Flink kafka table
 
+[子模块维护](https://www.jianshu.com/p/9000cd49822c)
+
 ## Cloud9 
 
 ## kafka table支持属性

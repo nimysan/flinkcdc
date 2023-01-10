@@ -39,7 +39,7 @@ services:
     image: mysql:8.0.31
     command: --default-authentication-plugin=mysql_native_password --secure_file_priv=/data
     ports:
-      - "3307:3306"
+      - "3306:3306"
     environment:
       MYSQL_USER: "sql-demo"
       MYSQL_PASSWORD: "demo-sql"
