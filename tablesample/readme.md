@@ -40,3 +40,10 @@ topic-pattern
 value.fields-include
 value.format
 ```
+
+## 关键
+
+```bash
+git submodule update --remote --merge
+
+```
